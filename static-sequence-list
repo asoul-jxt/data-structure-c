@@ -1,0 +1,157 @@
+/*头文件与顺序表的存储结构及各种操作的声明*/
+#include<stdio.h>
+#include<stdlib.h>
+#define MAXSIZE 100
+#define OK 1
+#define ERROR 0
+ 
+typedef int ElemType;
+typedef struct seqlist {
+	ElemType elem[MAXSIZE];
+	int last;                       /*last为顺序表最后一个有效数据元素的下标*/
+}SeqList;
+ 
+void InitList(SeqList* L);                      /*初始化顺序表*/
+void PrintList(SeqList* L);
+int Locate(SeqList* L, ElemType e);             /*按内容查找顺序表并返回其元素序号*/
+ElemType GetElem(SeqList* L, int i);                 /*查找顺序表中第i个数据元素并返回其值*/
+int InsList(SeqList* L, int i, ElemType e);     /*在顺序表中第i个元素前插入元素e*/
+int DelList(SeqList* l, int i, ElemType* e);    /*删除顺序表中第i个数据元素并用指针参数e返回其值*/
+void MergeList(SeqList* LA, SeqList* LB, SeqList* LC);     /*合并顺序表LA和LB*/
+ 
+/*各种操作的定义*/
+void InitList(SeqList* L)        /*初始化顺序表*/
+{
+	int i;
+	L->last = 0;
+	for (i = 0; i <= MAXSIZE; i++)
+	{
+		L->elem[i] = 0;
+	}
+}
+ 
+void PrintList(SeqList* L)       /*打印顺序表*/
+{
+	int i = 0;
+	while (i <= L->last)              /*从0下标打印到最后一个元素的下标*/
+	{
+		printf("%d ", L->elem[i]);
+		if ((i + 1) % 4 == 0)
+		{
+			printf("\n");
+		}
+		i++;                         /*每5个一换行*/
+	}
+	printf("\n\n");
+}
+ 
+int Locate(SeqList* L, ElemType e)   /*按内容查找顺序表并返回其元素序号*/
+{
+	int i = 0;   /*计数*/
+	while ((i <= L->last) && (L->elem[i] != e))    /*遍历顺序表直至其中有元素与查找内容相同*/
+	{
+		i++;
+	}
+	if (i <= L->last)                   
+	{
+		return i+1;                             /*如果在遍历完成之前找到，则返回其下标+1即它的序号*/
+	}
+	else
+	{
+		printf("查无此元素！\n\n");           /*如果不存在，则打印提示*/
+		return ERROR;
+	}
+}
+ 
+ElemType GetElem(SeqList* L, int i)
+{
+	return L->elem[i];                            /*时间复杂度为O(1)的查找正是顺序表的优势*/
+}
+ 
+int InsList(SeqList* L, int i, ElemType e)     /*在顺序表中第i个元素前插入元素e*/
+{
+	int j = 0;
+	if (i < 1 || i > L->last + 2)                     /*注意合法插入位置在1到有效数据个数+1(Last + 2)*/
+	{
+		printf("插入位置不合法！\n\n");
+		return ERROR;
+	}
+	if (L->last >= MAXSIZE - 1)                /*注意判断条件为大于等于而不是等于*/
+	{
+		printf("表已满，无法插入！\n\n");
+		return ERROR;
+	}
+	for (j = L->last + 1; j >= i; j--)          /*把从插入位置起之后的所有有效数据往后挪一位*/
+	{
+		L->elem[j] = L->elem[j - 1];
+	}
+	L->elem[i - 1] = e;                  /*在插入位置上写入数据*/
+	L->last++;                            /*注意最后一个有效数据元素下标+1*/
+	return OK;
+}
+ 
+int DelList(SeqList* L, int i, ElemType* e)    /*删除顺序表中第i个数据元素并用指针参数e返回其值*/
+{
+	int j = 0;
+	if (i < 1 || i > L->last + 1)               /*删除的合法位置是从1到有效数据元素的个数(Last + 1)*/
+	{
+		printf("删除位置不合法！");
+		return ERROR;
+	} 
+	*e = L->elem[i - 1];                          /*用指针变量e带出被删除的数据元素*/
+	for (j = i - 1; j < L->last - 1; j++)
+	{
+		L->elem[j] = L->elem[j + 1];               /*把被删元素之后的所有有效数据元素往前挪1位*/
+	}
+	L->last--;                       
+	return OK;
+}
+ 
+void MergeList(SeqList* LA, SeqList* LB, SeqList* LC)     /*合并有序非降序顺序表LA和LB*/
+{
+	int i = 0, j = 0, k = 0;
+	while (i <= LA->last && j <= LB->last)          /*将顺序表LA和LB中的数据元素由小到大插入 
+                                              到顺序表LC的末尾，直至其中任意一个表遍历完成*/
+	{
+		if (LA->elem[i] <= LB->elem[j])
+		{
+			LC->elem[k] = LA->elem[i];
+			k++;
+			i++;
+		}
+		else
+		{
+			LC->elem[k] = LB->elem[j];
+			k++;
+			j++;
+		}
+	}         /*while */
+	while (j <= LB->last)
+	{
+		LC->elem[k] = LB->elem[j];
+		j++;
+		k++;
+	}      /*while */
+	while (i <= LA->last)
+	{
+		LC->elem[k] = LA->elem[i];
+		i++;
+		k++;
+	}      /*while */
+	LC->last = LA->last + LB->last + 1;  /*将还有余量的顺序表全部依次插入到表LC中，并将LC- 
+                                            >Last设置为LA->last + LB->last + 1*/
+}
+ 
+/*主函数及测试函数*/
+void SeqListTest()
+{
+	                /*自定义语句，用于测试各种操作*/
+}
+int main()
+{
+	SeqListTest();     /*调用测试函数*/
+	return 0;
+
+————————————————
+版权声明：本文为CSDN博主「嘉然今天码代码」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/static_diana/article/details/120988342
